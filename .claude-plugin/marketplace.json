@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agent-project-kit",
+  "description": "一个人 + 多个 AI Agent 的项目基础设施",
+  "owner": {
+    "name": "JIN HAIMIN",
+    "url": "https://github.com/LcokHcak"
+  },
+  "plugins": [
+    {
+      "name": "agent-project-kit",
+      "description": "仓库即共享记忆：项目初始化、任务流程（new / next / start / finish / handoff）、调研子代理、会话启动自动注入 STATUS 和 BOARD。",
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/LcokHcak/agent-project-kit"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "agent-project-kit",
+  "version": "0.1.0",
+  "description": "一个人 + 多个 AI Agent 做项目的基础设施：仓库即共享记忆（AGENTS.md / STATUS / BOARD / 说明书 / ADR / 调研笔记），任务流程 skill，调研子代理，会话启动自动注入项目状态。",
+  "author": {
+    "name": "JIN HAIMIN",
+    "url": "https://github.com/LcokHcak"
+  },
+  "homepage": "https://github.com/LcokHcak/agent-project-kit",
+  "repository": "https://github.com/LcokHcak/agent-project-kit",
+  "license": "MIT",
+  "keywords": ["workflow", "multi-agent", "project-management", "agents-md", "handoff"]
+}
