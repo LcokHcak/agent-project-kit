@@ -1,5 +1,5 @@
 {
-  "description": "会话启动时，如果项目里有 docs/STATUS.md，就把交接单和任务板注入上下文；其他项目里不输出任何内容。",
+  "description": "会话启动时，如果项目里有 docs/STATUS.md，就把交接单、任务板和体检结果注入上下文；其他项目里不输出任何内容。",
   "hooks": {
     "SessionStart": [
       {

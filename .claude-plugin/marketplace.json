@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "agent-project-kit",
-      "description": "仓库即共享记忆：项目初始化、任务流程（new / next / start / finish / handoff）、调研子代理、会话启动自动注入 STATUS 和 BOARD。",
+      "description": "仓库即共享记忆：项目初始化、任务流程（new / next / start / finish / handoff / case / check）、回归用例、体检脚本、调研子代理、会话启动自动注入 STATUS、BOARD 和体检结果。",
       "source": "./",
       "category": "productivity",
       "homepage": "https://github.com/LcokHcak/agent-project-kit"
