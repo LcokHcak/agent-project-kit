@@ -1,5 +1,7 @@
 # AGENTS.md
 
+项目安装了 `scripts/kit-handoff.mjs` 时，用 `knowledge <关键词>` 查既有经验，`export <新目录>` 导出可编辑记录，`restore <交接目录>` 合入离线工作。任务进行中把负责人、证据和下一步写入说明书。收尾时在 `docs/retros/<任务号>.md` 记录结果与偏差、验收证据、可复用经验、后续行动。用「## 可复用经验」标记可检索的内容。需要多端协作时连接团队指定的 Git remote。
+
 所有 Agent（Claude、Codex、Cursor……）进入本项目时都先读这份文件。它是一张地图，只写规则和去哪找；细节在 `docs/` 里。人看的版本见 [docs/workflow.md](docs/workflow.md)。
 
 ## 项目一句话

@@ -86,7 +86,7 @@ test('清单文件能解析，版本号和更新记录对得上', () => {
 test('flow 的每个动作在参数提示、README 和 CLAUDE.md 模板里都提到了', () => {
   const skill = read('skills/flow/SKILL.md');
   const actions = [...skill.matchAll(/^## ([a-z]+)/gm)].map(match => match[1]);
-  assert.deepEqual(actions, ['new', 'next', 'start', 'finish', 'handoff', 'case', 'check']);
+  assert.deepEqual(actions, ['new', 'next', 'start', 'finish', 'handoff', 'case', 'check', 'export', 'sync', 'retro', 'knowledge', 'assign', 'inbox', 'daily', 'weekly']);
   const hint = skill.match(/^argument-hint: "(.*)"$/m)[1];
   const readme = read('README.md');
   const claude = readFileSync(join(TEMPLATES, 'CLAUDE.md'), 'utf8');

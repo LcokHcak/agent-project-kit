@@ -2,7 +2,7 @@
 // In a project that uses the kit (has docs/STATUS.md), print the "当前" section, open questions,
 // the active rows of docs/BOARD.md and the result of the project check; stdout becomes session context.
 // In any other project it prints nothing, so installing the plugin globally is harmless.
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
 const MAX_ROWS = 15;
@@ -73,6 +73,18 @@ async function checkLines() {
   }
 }
 
+function recentReports() {
+  const dir = join(root, 'docs/retros');
+  try {
+    const recent = readdirSync(dir, { withFileTypes: true })
+      .filter(entry => entry.isFile() && !entry.name.startsWith('_') && entry.name.endsWith('.md'))
+      .map(entry => ({ name: entry.name, updated: statSync(join(dir, entry.name)).mtimeMs }))
+      .sort((a, b) => b.updated - a.updated).slice(0, 3);
+    return recent.length ? ['', '## 近期复盘', ...recent.map(entry => '- docs/retros/' + entry.name),
+      '按任务关键词运行 flow knowledge 检索经验。'] : [];
+  } catch { return []; }
+}
+
 const status = read('docs/STATUS.md');
 if (status) {
   const board = read('docs/BOARD.md');
@@ -84,6 +96,7 @@ if (status) {
     section(status, '当前') || '（STATUS.md 没有「当前」一节）',
     ...(questions ? ['', '## 开放问题', questions] : []),
     ...(board ? boardLines(board) : []),
+    ...recentReports(),
     ...(await checkLines()),
     '',
     '可用：/agent-project-kit:flow next 看下一步，flow case 把一次出错存成回归用例，flow handoff 在结束前更新交接单。',

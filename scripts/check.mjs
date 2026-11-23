@@ -206,8 +206,10 @@ function checkDuplicateIds(sections) {
     .map(([id, lines]) => ({ file: 'docs/BOARD.md', line: lines[1], message: `编号 ${id} 在任务板上重复出现（第 ${lines.join('、')} 行）` }));
 }
 
-function hasSpec(root, files, row) {
-  const linked = extractLinks(row.raw).some(({ target }) => {
+function hasSpec(root, files, section, row) {
+  // 旧任务板可能没有独立的说明书列，这时继续识别行内链接。
+  const specCell = cellOf(section, row, '说明书') ?? row.raw;
+  const linked = extractLinks(specCell).some(({ target }) => {
     const path = localPath(target);
     return path !== null && files.exists(resolveLink(root, 'docs/BOARD.md', path));
   });
@@ -216,7 +218,7 @@ function hasSpec(root, files, row) {
 
 function checkSpecs(root, files, sections) {
   return sections.filter(section => sectionIs(section, SECTIONS_NEEDING_SPEC)).flatMap(section => section.rows
-    .filter(row => !TYPES_WITHOUT_SPEC.test(cellOf(section, row, '类型') ?? '') && !hasSpec(root, files, row))
+    .filter(row => !TYPES_WITHOUT_SPEC.test(cellOf(section, row, '类型') ?? '') && !hasSpec(root, files, section, row))
     .map(row => ({
       file: 'docs/BOARD.md',
       line: row.line,

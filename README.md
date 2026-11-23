@@ -2,11 +2,58 @@
 
 [![ci](https://github.com/LcokHcak/agent-project-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/LcokHcak/agent-project-kit/actions/workflows/ci.yml)
 
-**一个人 + 多个 AI Agent 做项目的基础设施。** 一个 Claude Code 插件，装好之后，任何项目都能一条命令搭起同一套「记录什么、写在哪、谁做什么、怎么不退步」的体系。
+**把任务派给人或 AI，让下一位接手的人知道已经做了什么、证据在哪里、还需要谁帮忙。** Agent Project Kit 把任务板、日报、周报和复盘保存在项目自己的 Markdown 文件里。你可以独自用，也可以让同事在另一台电脑用 Claude Code 或 Codex 接着做。
 
-> Agent 不记得上一次对话。换一个会话、换成 Codex 或 Cursor，记忆都会清零。
-> 所以**仓库本身就是共享记忆**：下一个 Agent 需要知道的，都写进仓库里的文件。
-> 而写在文件里的规则也会被忘，所以**能让机器检查的规则，就交给机器检查**。
+## 团队一周怎么用
+
+| 场景 | 在项目里说 | 接下来会看到什么 |
+| --- | --- | --- |
+| 个人安排今天的工作 | `flow inbox 小林` | 列出小林待开工、进行中和待验收的任务，打开说明书就能找到交付条件。 |
+| 把任务交给同事或 Agent | `flow assign T-102 小周` | 任务板记下负责人，小周的收件箱出现 T-102。开工与验收各有自己的状态。 |
+| 每人写当天进展 | `flow daily`，附上结果、证据、需要谁帮忙和下一步 | 每人每天一份记录。已开同步的成员能看到对方的求助，分别编辑自己的文件。 |
+| 周五一起复盘 | `flow weekly 2026-11-27` | 汇总当周日报，按成果、求助和每个人最后填报的下一步排列。每条可以点回原文；会后继续派单。 |
+
+### 运行三个使用场景
+
+克隆本仓库后，从仓库根目录运行下面的示例。需要 Node.js 18 或以上，目标目录须尚不存在。
+
+```sh
+node examples/team-week.mjs ./demo-week
+```
+
+示例用一个虚构读书会演示三个场景。**个人**先写报名须知，留下等待场地确认的事项。**两人协作**时，小周收到报名演练任务，在日报里请小林调整取消入口。**周回顾和换人**时，负责人能在周报里看到两人的记录，并把交接目录带走。它会生成真实文件，可继续运行下面的命令查看结果。
+
+```sh
+cd demo-week
+node scripts/kit-team.mjs inbox 小周
+node scripts/kit-team.mjs weekly 2026-11-27
+node scripts/kit-handoff.mjs export ../next-organizer
+```
+
+### 同类工具各自擅长什么
+
+| 工具 | 官方工作流的侧重点 | 项目里适合采用的场景 |
+| --- | --- | --- |
+| **Agent Project Kit** | 项目共享任务板、按负责人派单、日报汇总、可离线编辑的交接包，以及可检索的任务复盘。 | 多个成员轮流接手，周会上需要从结论追到具体任务和当天的原始记录。 |
+| **GitHub Spec Kit** | 从需求规格走到计划、任务、实现和核对，提供可定制的开发流程。[官方仓库](https://github.com/github/spec-kit) | 大功能开工前，希望把用户需求和验收标准写清楚。 |
+| **OpenSpec** | 围绕一项变更组织提案、规格与实施，完成后归档。[官方仓库](https://github.com/Fission-AI/OpenSpec) | 已有产品要改变行为，需要讨论提案、保留生效的规格。 |
+| **Superpowers** | 把设计、实施计划、测试驱动开发和代码审查组织成 Agent 技能。[官方仓库](https://github.com/obra/superpowers) | 工程任务已经明确，需要带着 Agent 分步实现、测试和审查。 |
+
+我们的优势在日常沟通成本上。周五有人问“报名页卡在哪里”，团队可以从周报点回小周的原话，再去任务板看负责人。换成其他协作工具处理规格或写代码时，可以把对应文档、测试和 PR 链回同一任务。上表比较工作流；没有做效率跑分。
+
+## 在不同项目使用
+
+**Claude Code** 安装一次，在每个需要管理的项目根目录运行 `/agent-project-kit:project-init`。已有记录的项目可以沿用任务板和交接单。
+
+**Codex** 克隆插件后执行以下命令。安装器把用户级技能链接到当前克隆。保留该目录，更新时在其中拉取新版本。然后在任意项目的新会话说“用 agent-project-kit 初始化这个项目”。
+
+```sh
+git clone https://github.com/LcokHcak/agent-project-kit.git
+cd agent-project-kit
+node scripts/install-codex.mjs
+```
+
+**已有项目升级**时，把新版 `scripts/check.mjs`、`scripts/handoff.mjs`、`scripts/team.mjs` 分别更新到项目内的 `scripts/kit-check.mjs`、`scripts/kit-handoff.mjs`、`scripts/kit-team.mjs`。旧任务板在首次派单时会补上负责人列。每个项目独立决定是否启用 Git 同步；启用时为每个项目使用独立的远程仓库，团队成员连接同一项目的仓库。收件箱来自任务板，日报和周报在调用时生成；外部聊天通知和定时提醒需要另外接入。
 
 ## 它解决什么问题
 
@@ -151,7 +198,7 @@ claude plugin marketplace update agent-project-kit
 
 - 把 [`skills/project-init/templates/`](skills/project-init/templates/) 复制到项目根目录，手动替换 `{{占位符}}`。
 - `AGENTS.md` 是 Codex、Cursor 等工具都会读的标准文件。
-- [`skills/flow/SKILL.md`](skills/flow/SKILL.md) 里的七个动作，可以直接当提示词交给任何 Agent。
+- [`skills/flow/SKILL.md`](skills/flow/SKILL.md) 里的任务和交接流程可以直接交给其他 Agent。
 - [`scripts/check.mjs`](scripts/check.mjs) 只需要 Node，放进任何 CI 都能跑。
 
 ## 目录
@@ -191,3 +238,21 @@ node --test
 ## 许可
 
 MIT
+
+## 跨电脑协作与任务复盘（0.3）
+
+在项目根目录执行。初始化会安装零依赖的 Node 脚本 `scripts/kit-handoff.mjs`。旧项目可直接从插件复制 `scripts/handoff.mjs` 到上述位置。
+
+| 工作 | 操作 |
+| --- | --- |
+| 离线导出 | `flow export <新目录>` 生成可编辑的 Markdown 目录、入口 HANDOFF.md、经验索引和可再导出的脚本。包里注明本地代码 HEAD；源码、音频、附件和会话原文须另行交接。 |
+| 离线交回 | 在目标项目根运行 `node scripts/kit-handoff.mjs restore <交接目录>`。按导出基线合并文档，双方修改同一文件时先列出冲突。已导出的目录可以再次导出，同时保留最初基线。 |
+| 实时共享 | 每位成员在自己的项目 Git 根目录执行 `node scripts/kit-handoff.mjs connect <remote名称>`，再运行 `node scripts/kit-handoff.mjs watch`。脚本每轮完成后等 15 秒再次同步，Ctrl+C 停止。一次同步用 `flow sync`。 |
+| 任务复盘 | `flow finish` 时生成报告；随时可用 `flow retro T-101` 补充已验证的经验。报告是可编辑的 `docs/retros/T-101.md`，按任务编号保存。 |
+| 经验复用 | `flow knowledge 断网` 从所有复盘的当前内容检索。CLI 对应 `node scripts/kit-handoff.mjs knowledge 断网`。 |
+
+**共享范围。** 独立的 Git 分支 `agent-project-kit-handoff` 保存文档快照，和产品分支有独立的提交历史。两端需要能读写同一 Git 仓库。可以用本机或局域网内的 bare 仓库验证，也可以显式选定团队私有 remote。首次连接只保存选择。只在运行 sync、watch 或已连接的技能执行同步时传输。共享范围包括 AGENTS、STATUS、BOARD、ROADMAP、workflow 和 specs、adr、plan、retros、review、research、experiments、evals/cases、lab/cases 中的 Markdown。目标分支的读者均能阅读这些记录，请按项目读者范围选择 remote。
+
+**切换和冲突。** 不同文档的修改自动合并；两人改同一文档时会列出路径并暂停写入项目。用 `incoming <新目录>` 查看对端，按提示执行 `resolve local|remote <标识>` 选择要保留的一版。需要融合两版时编辑本地文件，重新 sync 获取对应标识，再选择 local。变动过的冲突标识会失效。断线时本地文件仍能编辑，watch 在下一轮重试。历史记录用文档内的「作废／归档」标记；单端移走文档后，同步会从其他快照补回。源码、工作树、暂存区和业务分支由项目原有的 Git 流程管理。
+
+**换会话。** 启动时读 STATUS、BOARD 和近期复盘。开工前检索同类经验；每完成一项验收就把证据和接续点写入对应说明书，阶段结束再总结。项目已连接时按技能流程同步；两台电脑持续联网并运行 watch 时，保存的记录会自动传到对端。

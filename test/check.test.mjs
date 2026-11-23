@@ -121,6 +121,22 @@ test('行里没有链接时，按文件名找到说明书也算有', () => {
   assert.deepEqual(result.errors, []);
 });
 
+test('评审证据的链接不能代替缺失的说明书', () => {
+  const result = run(healthy({
+    'docs/BOARD.md': board({ review: ['| T-102 | 复核录音 | [报告](report.md) | 待写 |'] }),
+    'docs/report.md': '# 测试报告',
+  }));
+  assert.match(messages(result.errors), /T-102.*说明书/);
+});
+
+test('说明书列可以链接项目内自定义位置的说明书', () => {
+  const result = run(healthy({
+    'docs/BOARD.md': board({ review: ['| T-102 | 复核录音 | 已测试 | [验收说明](design/recording.md) |'] }),
+    'docs/design/recording.md': '# 录音验收说明',
+  }));
+  assert.deepEqual(result.errors, []);
+});
+
 test('杂务不需要说明书', () => {
   const result = run(healthy({
     'docs/BOARD.md': board({

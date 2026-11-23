@@ -1,10 +1,14 @@
 ---
 name: flow
-description: 用 agent-project-kit 管理的项目的任务流程，项目根目录要有 AGENTS.md、docs/STATUS.md 和 docs/BOARD.md。用户说 "flow new|next|start|finish|handoff|case|check"、"开个任务"、"下一步做什么"、"开工 T-xxx"、"收尾"、"交接"、"更新 STATUS"、"记一条用例"、"这次输出错了，记下来"、"体检"、"检查项目文档" 时使用。负责维护 docs/BOARD.md、docs/STATUS.md、docs/specs/ 和 evals/cases/。
-argument-hint: "new <想法> | next | start T-xxx | finish | handoff | case <哪里错了> | check"
+description: 个人与团队项目管理。派任务、查收件箱、写日报、做周回顾、开工验收、导出与同步交接、整理复盘。支持 assign/inbox/daily/weekly 和原有任务流程。
+argument-hint: "new <想法> | next | start T-xxx | finish | handoff | case <哪里错了> | check | export <新目录> | sync | retro T-xxx | knowledge <关键词> | assign T-xxx 负责人 | inbox 负责人 | daily | weekly"
 ---
 
 # flow
+
+用户说「导出交接包」「换电脑接手」「同步进度」「整理复盘」「找以前的经验」时，分别使用 export、handoff、sync、retro、knowledge。项目装了 `scripts/kit-handoff.mjs` 时优先使用；否则用本技能目录往上两级的 `scripts/handoff.mjs`。从项目根目录执行。
+
+已连接协作仓库的项目，在开工前、接手前以及每次保存进展后运行 `sync`。其他项目直接读写本机文件。完成一项验收、发现阻塞、改变决策或换负责人时，立即在对应说明书记录负责人、进度、证据、下一步和代码提交号；任务状态变化时更新 BOARD。多人并行时各写各的说明书，按现有分工由总控维护共享表。
 
 前提：项目根目录有 `AGENTS.md`、`docs/STATUS.md` 和 `docs/BOARD.md`。没有的话，先运行 `/agent-project-kit:project-init`。
 
@@ -38,20 +42,24 @@ argument-hint: "new <想法> | next | start T-xxx | finish | handoff | case <哪
 
 1. 跑体检脚本。有错误时先列出来并修掉（任务板和文件对不上时，下面的建议也不可信）；提醒如实转告用户。
 2. 读 `docs/STATUS.md` 的「当前」和「开放问题」，以及 `docs/BOARD.md`。有 `docs/plan/exec-plan.md` 时也读它：当前在哪个阶段、离「走完的标志」还差什么、哪些决定还没拍板。
-3. 列出 `Ready` 的任务，按依赖关系和价值排序。
+3. 核对交接单标明的当前版本、主线和它引用的路线图，再给 `Ready` 任务排序。历史版本、设计草案或其他主线的任务单列并注明归属。路线图里的下一步还没有任务编号时，作为「待建任务」提出，保留已有任务的编号和状态。资料冲突且无法判定归属时，列出冲突的文件和需要确认的问题。
 4. 判断哪些可以并行：「允许改动」的目录互不重叠，且都不碰共享文件。同时进行的任务最多 3 个（包括已经 In progress 的）。
 5. 有需要用户做的事（开放问题、待拍板的决定、需要他本人操作的杂务），放在最前面。
 6. 输出建议：先做哪个、哪些可以各开一个会话并行、每个任务适合用哪一档模型（写说明书和评审用最强的，按说明书实现用主力编码模型，调研用便宜的）。在 Claude 桌面端可以用 `start_session` 为每个并行任务各开一个会话：仓库已有提交时用 worktree；没有提交或要共用目录时，在简要说明里写明「不切换分支、不提交、只改说明书允许的文件、不改 BOARD 和 STATUS」。简要说明的开头写「先读 AGENTS.md，然后执行 flow start T-xxx」。
 
 ## start T-xxx：开工
 
+已派给别人的任务，先核对交接安排。移动任务行时保留负责人；从 Ready 接单才记录实际开始，移到 Review 时继续保留负责人直到验收。
+
 1. 读 `AGENTS.md`、`docs/STATUS.md` 和任务说明书。说明书不存在或任务不在 `Ready`，就停下来告诉用户。
 2. 检查冲突：BOARD 上其他 `In progress` 任务的「允许改动」与本任务重叠时，停下来报告。说明书写着「由总控执行」的任务（只改共享文件），只能在总控会话里做；当前是执行者会话时，停下来告诉用户。
-3. 建分支：`git switch -c task/T-xxx-<短名>`。如果已经在 worktree 会话里，或者简要说明里要求不切换分支，就沿用当前分支，并把分支名记进 BOARD。
+3. 在 Git 项目可用 `git switch -c task/T-xxx-<短名>` 建分支。已经在 worktree 会话或说明要求沿用分支时记录当前分支。普通项目文件夹直接按说明书开工，在 BOARD 记录负责人及交付物路径。
 4. 把 BOARD 里这一行移到 `In progress`，填上「谁在做」（会话名或人名）和分支。简要说明里要求不改 BOARD 的，跳过这一步，在最后的汇报里说明。
-5. 测试先行：先写失败的测试，再写实现。只改说明书允许的文件。调研类任务不写代码，产出写进 `docs/research/`，可以派 `vendor-researcher` 子代理去做。
+5. 代码改动采用测试先行；文案、运营、调研按说明书约定的样稿、来源、演练或人工验收留证。只改说明书允许的文件。厂商调研产出写进 `docs/research/`。
 6. 任务里有付费调用（模型、语音识别、云服务）时：常规测试用假实现或录制的响应；真实调用放在单独的脚本里，第一次运行前把估算（次数 × 单价）告诉用户并等他确认；每次调用都要留下追踪记录（模型、提示词版本、token、费用、耗时）。
 7. 中途发现说明书不对（做不到、范围不够），先改说明书并告诉用户，不要悄悄扩大范围。
+
+开工前用任务关键词检索既有复盘。记录采用了哪条经验、适用条件是否吻合。
 
 ## finish：收尾
 
@@ -63,10 +71,13 @@ argument-hint: "new <想法> | next | start T-xxx | finish | handoff | case <哪
 6. BOARD：这一行移到 `Review`，附上证据摘要。如果当前就是总控会话并且已经合并，直接移到 `Done`，写上完成日期和证据。
 7. STATUS：在验收记录里加一行；「能用的 / 没做的」有变化时同步更新。
 8. 做过选型或架构决定的，用 `docs/adr/_TEMPLATE.md` 写一份 ADR。查过外部资料的，确认已经写进 `docs/research/`。
+   同时执行 `flow retro <任务号>`，留下结果、证据、可复用经验与后续行动，在任务说明书的「结果」里链接这份复盘。能验证的教训链接到已有检查或回归用例。已经有报告就更新原文件。
 9. 跑体检脚本，错误必须清零。
 10. 只有用户要求时才提交、推送或开 PR。提交信息格式为 `<类型>: T-xxx 简述`，类型可以是 feat、fix、refactor、docs、test、chore。有远程仓库时，一个任务一个 PR，按 `.github/pull_request_template.md` 填写，CI 通过后才合并。
 
 ## handoff：会话结束前交接
+
+交接时注明当前代码提交号、未提交的代码变化、接手人先看哪个文件、应从哪条验证命令继续。已连接时先同步并报告结果。对方要离线接手时同时执行 export。
 
 1. 重写 `docs/STATUS.md` 的「当前」一节，只写事实：阶段、能用的、没做的、下一步、待拍板。末尾写「更新于 YYYY-MM-DD，由谁更新」（体检脚本靠这个日期判断交接单是否过期）。
 2. 这次会话踩到的坑，追加到「已知的坑」，一条一句，写清楚怎么绕过。
@@ -107,3 +118,41 @@ argument-hint: "new <想法> | next | start T-xxx | finish | handoff | case <哪
 - 不要同时开超过 3 个并行任务。
 - 不要在没有估算和用户确认的情况下跑付费调用。
 - 不要删除或改写已有的回归用例来让评测通过；用例错了要说明原因并告诉用户。
+
+## export <新目录>：导出交接包
+
+接收已有交接包时，从目标项目根目录运行 `node scripts/kit-handoff.mjs restore <交接目录>`。先阅读包内 HANDOFF.md，核对代码基线。
+
+从项目根运行 `node scripts/kit-handoff.mjs export <新目录>`（未安装脚本时用插件原件）。目录需尚不存在。把生成的 HANDOFF.md、KNOWLEDGE.md 和目录位置交给用户。接手人可以继续编辑 Markdown 并再次导出；恢复开发时按 HANDOFF.md 的提交号准备代码。
+
+## sync：同步项目记录
+
+运行 `node scripts/kit-handoff.mjs sync`。首次设置时使用用户指定的 Git remote，执行 `connect <remote>`；需要持续协作时在两端运行 `watch`。遇到并发冲突，先用 `incoming <新目录>` 对比双方版本；结合双方事实，按命令输出处理。未设置目标时继续本机工作并说明同步状态。
+
+## retro <任务号>：整理任务复盘
+
+根据任务说明、验收记录和版本变更写四项内容：结果与原目标的偏差、可复查的证据、可复用的做法及其适用条件、待跟进事项。任务进行中已验证的经验也应及时补进同一份报告。缺证据的内容明确写「待验证」。给经验写具体的检索词。
+
+首次生成时，向 `node scripts/kit-handoff.mjs retro <任务号>` 的标准输入传一个 JSON 对象，字符串字段为 `title`、`result`、`evidence`、`lessons` 和 `next`。结果存到 `docs/retros/<任务号>.md`。已有报告直接编辑；保留「## 可复用经验」标题以便索引。更新后运行 knowledge 检查能否按主题查回。已连接协作仓库的项目立即同步。
+
+## knowledge <关键词>：复用已有经验
+
+运行 `node scripts/kit-handoff.mjs knowledge [关键词]`。说明哪条经验适用于当前任务，并链接原报告供核对。结果根据当前 Markdown 实时生成；导出包的 KNOWLEDGE.md 记录导出当时的索引。
+
+## assign T-xxx 负责人
+
+派单前读任务说明书并确认目标和验收条件。运行 `node scripts/kit-team.mjs assign <任务号> <负责人>`，报告编号、负责人、交付物和验收方式。任务保持原状态，接单开工走 start。需要新任务先走 new。已连接时同步任务板，负责人可以用 inbox 查收。给某人派单只更新项目记录；对外发送通知需要用户另外指定渠道和收件人。
+
+## inbox 负责人
+
+运行 `node scripts/kit-team.mjs inbox <负责人>`，按任务板列出该人或 Agent 的 Ready、In progress、Review 项。按需附上说明书。个人项目也可以把任务派给自己。
+
+## daily
+
+根据当天的验收、提交、调研或会议记录填写进展与证据、阻塞与需要谁协助、下一步；日期按项目成员当地日期。运行 `node scripts/kit-team.mjs daily <日期> <负责人> <进展与证据> <阻塞> <下一步>`。每人每天一份；更新同一份日报时先读原文，合并当天已经记录的事实。已连接时同步。
+
+## weekly
+
+从指定周内任一天生成周一至周日的回顾：`node scripts/kit-team.mjs weekly <日期> --save`。按进展、求助和每人最近一次报告的下一步汇总，保留来源链接。汇报时指出哪项求助已有后续证据、哪项需要负责人确认。达成的新分工用 new 或 assign 进任务板。周报按需生成，团队自行选择每周回顾的时间。
+
+上述四个动作优先使用同版的项目脚本；缺少时从项目根运行套件的 `scripts/team.mjs`。

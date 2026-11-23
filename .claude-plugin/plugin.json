@@ -1,7 +1,7 @@
 {
   "name": "agent-project-kit",
-  "version": "0.2.0",
-  "description": "一个人 + 多个 AI Agent 做项目的基础设施：仓库即共享记忆（AGENTS.md / STATUS / BOARD / 说明书 / ADR / 调研笔记），加上三条工程纪律（出错留回归用例、模型调用留痕、规则靠体检脚本和 CI 机械执行）。任务流程 skill、调研子代理、会话启动自动注入项目状态和体检结果。",
+  "version": "0.4.0",
+  "description": "个人和团队的项目协作工具。为人和 Agent 派单、查看任务收件箱，把每日进展汇成周报，用 Markdown 和 Git 在项目成员、设备和会话之间交接。",
   "author": {
     "name": "JIN HAIMIN",
     "url": "https://github.com/LcokHcak"

@@ -19,6 +19,8 @@ argument-hint: "[项目目录，默认为当前目录]"
 
 ## 2. 了解项目（自己查，少问人）
 
+活动、写作、设计、科研等项目可以在普通文件夹初始化。把代码地图改为交付物目录，把测试命令换成该项目真实的核稿、样品评估或验收步骤。个人项目允许负责人始终是同一个人；团队项目按成员或 Agent 分配。Git 是联网同步的依赖，离线派单、日报、周报和导出均可在普通文件夹使用。
+
 从仓库里推断，不要凭空编：
 
 | 要填的 | 去哪找 |
@@ -46,6 +48,8 @@ argument-hint: "[项目目录，默认为当前目录]"
 
 | 文件 | 什么时候装 |
 | --- | --- |
+| `scripts/kit-team.mjs` | 有 Node 时将插件 `scripts/team.mjs` 复制到这里，同时安装同版本的 `scripts/kit-check.mjs`。项目可以在自己的目录内管理派单、收件箱、日报和周报。 |
+| `scripts/kit-handoff.mjs` | 有 Node 时将插件 `scripts/handoff.mjs` 原样复制到这里。用于交接导出、复盘、经验检索和可选 Git 同步。已有项目升级可只补这个脚本；保留现有交接单。 |
 | `scripts/kit-check.mjs` | 机器上有 Node 时装。来源不在 `templates/` 里，而是插件根目录的 `scripts/check.mjs`（`${CLAUDE_SKILL_DIR}/../../scripts/check.mjs`，即本 skill 目录往上两级），原样复制并改名。装了之后在 `{{COMMANDS}}` 里加一行 `node scripts/kit-check.mjs   # 体检：任务板、说明书、文档链接` |
 | `.github/workflows/ci.yml` | 项目是 git 仓库、打算放在 GitHub 上、还没有 CI 时装。没装体检脚本时，删掉文件里的 `kit-check` 这个 job |
 | `.github/pull_request_template.md` | 和 `ci.yml` 一起装 |
