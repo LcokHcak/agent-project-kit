@@ -1,6 +1,6 @@
 {
   "name": "agent-project-kit",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "个人和团队的项目协作工具。为人和 Agent 派单、查看任务收件箱，把每日进展汇成周报，用 Markdown 和 Git 在项目成员、设备和会话之间交接。",
   "author": {
     "name": "JIN HAIMIN",

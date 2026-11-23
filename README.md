@@ -1,5 +1,9 @@
 # agent-project-kit
 
+**组队版。** 项目经理、成员与各自的 Agent 在这里派单、同步进展和交接。自己独立推进项目可安装独立的 [Agent Project Kit Solo](https://github.com/LcokHcak/agent-project-kit-solo)。两套插件可以同时安装、分别更新。
+
+消息入口采用可选适配器。当前仓库提供可运行的渠道路由接口、回调身份映射和本地测试；工作台、常在线项目助手及生产聊天平台接入仍处于原型设计阶段。[渠道接口与原型约定](docs/channel-adapters.md)
+
 [![ci](https://github.com/LcokHcak/agent-project-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/LcokHcak/agent-project-kit/actions/workflows/ci.yml)
 
 **把任务派给人或 AI，让下一位接手的人知道已经做了什么、证据在哪里、还需要谁帮忙。** Agent Project Kit 把任务板、日报、周报和复盘保存在项目自己的 Markdown 文件里。你可以独自用，也可以让同事在另一台电脑用 Claude Code 或 Codex 接着做。
